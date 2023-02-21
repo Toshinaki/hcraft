@@ -1,13 +1,19 @@
 import csv
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Union
+from typing import Any, Union
 
 import yaml
 
 
 @contextmanager
-def read_or_create_yml(path, encoding="utf-8", newline=None, default="", **kwargs):
+def read_or_create_yml(
+    path: str | Path,
+    encoding: str = "utf-8",
+    newline: str | None = None,
+    default: Any = "",
+    **kwargs
+):
     """Open a file if exists; else create a new one with given name"""
     filepath = Path(path)
     if not filepath.exists():
@@ -24,7 +30,9 @@ def read_or_create_yml(path, encoding="utf-8", newline=None, default="", **kwarg
 
 
 @contextmanager
-def read_yml(path, encoding="utf-8", newline=None, **kwargs):
+def read_yml(
+    path: str | Path, encoding: str = "utf-8", newline: str | None = None, **kwargs
+):
     file = open(path, mode="r", encoding=encoding, newline=newline, **kwargs)
     try:
         yield yaml.safe_load(file)
@@ -32,14 +40,20 @@ def read_yml(path, encoding="utf-8", newline=None, **kwargs):
         file.close()
 
 
-def write_yml(path, data, encoding="utf-8", newline=None, **kwargs):
+def write_yml(
+    path: str | Path,
+    data: Any,
+    encoding: str = "utf-8",
+    newline: str | None = None,
+    **kwargs
+):
     with open(path, "w", encoding=encoding, newline=newline, **kwargs) as file:
         yaml.safe_dump(
             data, file, encoding=encoding, allow_unicode=True, sort_keys=False
         )
 
 
-def yaml2csv(origin_path: Union[str, Path], target_path: Union[str, Path]):
+def yaml2csv(origin_path: str | Path, target_path: str | Path):
     with read_yml(origin_path) as data:
         with open(target_path, "w", encoding="utf-8", newline="") as f:
             writer = csv.writer(f)
