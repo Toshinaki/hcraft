@@ -9,7 +9,7 @@ from hcraft.exception import check_at_least_1, check_empty
 
 
 @dataclass
-class SelectorMapFilterRange:
+class RangeFilter:
     str_list: List[str]
     start: int | str | List[str]
     end: int | str | List[str]
@@ -18,7 +18,7 @@ class SelectorMapFilterRange:
 
 
 @dataclass
-class SelectorMapFilterExistence:
+class ExistenceFilter:
     str_list: List[str]
     patterns: List[str]
     use_regex: bool
@@ -30,10 +30,10 @@ class SelectorMapFilterExistence:
 
 
 @dataclass
-class FilterObj:
-    range: SelectorMapFilterRange | None = None
-    include: SelectorMapFilterExistence | None = None
-    exclude: SelectorMapFilterExistence | None = None
+class StrListFilter:
+    range: RangeFilter | None = None
+    include: ExistenceFilter | None = None
+    exclude: ExistenceFilter | None = None
 
     @root_validator
     def check_values(cls, values):
@@ -122,7 +122,9 @@ def filter_by_existence(
     return [s for s in str_list if (any(match_fn(s, m) for m in patterns) and include)]
 
 
-def filter_str_list(str_list: List[str], filters: FilterObj | None = None) -> List[str]:
+def filter_str_list(
+    str_list: List[str], filters: StrListFilter | None = None
+) -> List[str]:
     if filters:
         if filters.range:
             str_list = filter_by_range(str_list, **asdict(filters.range))
